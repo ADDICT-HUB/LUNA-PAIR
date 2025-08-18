@@ -13,7 +13,7 @@ function removeFile(FilePath) {
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-    async function MALVIN_XD_PAIR_CODE() {
+    async function GHAFFAR_PAIR_CODE() {
         const {
             state,
             saveCreds
@@ -96,13 +96,13 @@ https://github.com/XdKing2/Ghaffar-pair
 
 ——————
 
-> *© Powered by Malvin King*
+> *© Powered by Ghaffar King*
 Stay cool and hack smart. ✌🏻`; 
                         await sock.sendMessage(sock.user.id, {
 text: desc,
 contextInfo: {
 externalAdReply: {
-title: "ᴍᴀʟᴠɪɴ-xᴅ",
+title: "Ghaffar-md",
 thumbnailUrl: "https://files.catbox.moe/bqs70b.jpg",
 sourceUrl: "https://whatsapp.com/channel/0029Vb6f7T1DOQIfHivuTO2L
 mediaType: 1,
@@ -113,7 +113,7 @@ renderLargerThumbnail: true
 {quoted:code })
                     } catch (e) {
                             let ddd = sock.sendMessage(sock.user.id, { text: e });
-                            let desc = `Hey there, MALVIN-XD User!* 👋🏻
+                            let desc = `Hey there, User!* 👋🏻
 
 Thanks for using *MALVIN-XD* — your session has been successfully created!
 
@@ -128,7 +128,7 @@ https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
 
 *💻 Source Code:*  
 Fork & explore the project on GitHub:  
-https://github.com/XdKing2/MALVIN-XD
+https://github.com/xdking2/GHAFFAR-MD
 
 ——————
 
