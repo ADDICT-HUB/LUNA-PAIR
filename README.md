@@ -1,16 +1,16 @@
-# 🚀 Malvin-Session-Generator
+# 🚀 Ghaffar-Session-Generator
 
 ## 📊 Visitor Counter
 
 <p align="center">
-  <img src="https://profile-counter.glitch.me/XdKing2/count.svg" alt="visitor counter"/>
+  <img src="https://profile-counter.glitch.me/Ghaffar 2/count.svg" alt="visitor counter"/>
 </p>
 
 ---
 
 ## 💡 Fork This Project
 
-[![Fork Repo](https://img.shields.io/badge/FORK-REPO-black?style=for-the-badge&logo=github)](https://github.com/XdKing2/malvin-pair/fork)
+[![Fork Repo](https://img.shields.io/badge/FORK-REPO-black?style=for-the-badge&logo=github)](https://github.com/king2/Ghaffar-pair/fork)
 
 Generate session IDs for WhatsApp bots using [`@whiskeysockets/baileys`](https://github.com/whiskeysockets/baileys), with secure **MEGA** cloud storage and a fast web QR login.
 
@@ -53,12 +53,12 @@ Generate session IDs for WhatsApp bots using [`@whiskeysockets/baileys`](https:/
 ## 👑 Owner
 
 <p align="center">
-  <a href="https://github.com/XdKing2">
-    <img src="https://github.com/XdKing2.png" width="200" height="200" alt="Malvin King"/>
+  <a href="https://github.com/Ghaffar 2">
+    <img src="https://github.com/Ghaffar 2.png" width="200" height="200" alt="Ghaffar King"/>
   </a>
 </p>
 
-📬 [`Contact on WhatsApp`](https://wa.me/263780166288)
+📬 [`Contact on WhatsApp`](https://wa.me/923195984790)
 
 ---
 
