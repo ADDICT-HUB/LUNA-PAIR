@@ -92,7 +92,7 @@ https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
 
 *💻 Source Code:*  
 Fork & explore the project on GitHub:  
-https://github.com/XdKing2/MALVIN-XD
+https://github.com/itsguruu/SILENT-LUNA
 
 ——————
 
@@ -128,7 +128,7 @@ https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
 
 *💻 Source Code:*  
 Fork & explore the project on GitHub:  
-https://github.com/XdKing2/MALVIN-XD
+https://github.com/itsguruu/SILENT-LUNA
 
 ——————
 
