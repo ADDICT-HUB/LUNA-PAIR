@@ -1,21 +1,23 @@
-FROM node:lts-buster
+# Use a modern, supported Node.js base image
+FROM node:18-bullseye
 
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Install system dependencies
 RUN apt-get update && \
-  apt-get install -y \
-  ffmpeg \
-  imagemagick \
-  webp && \
-  apt-get upgrade -y && \
-  rm -rf /var/lib/apt/lists/*
-  
-WORKDIR /usr/src/app
+    apt-get install -y ffmpeg imagemagick webp && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY package.json .
-
-RUN npm install && npm install -g qrcode-terminal pm2
-
+# Copy the rest of your bot files
 COPY . .
 
-EXPOSE 5000
+# Expose the port your app uses
+EXPOSE 10000
 
-CMD ["npm", "start"]
+# Start the bot
+CMD ["node", "index.js"]
