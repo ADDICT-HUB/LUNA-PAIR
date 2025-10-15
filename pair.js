@@ -1,114 +1,135 @@
-const fs = require('fs');
-const express = require('express');
-const pino = require("pino");
-const router = express.Router();
 const { makeid } = require('./gen-id');
-const { upload } = require('./mega');
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const pino = require("pino");
 const {
-    default: makeWASocket,
-    useMultiFileAuthState,
-    delay,
-    Browsers,
-    makeCacheableSignalKeyStore,
+  default: makeWASocket,
+  useMultiFileAuthState,
+  delay,
+  Browsers,
+  makeCacheableSignalKeyStore
 } = require('@whiskeysockets/baileys');
 
-// ✅ Ensure temp folder exists
-const TEMP_PATH = './temp';
-if (!fs.existsSync(TEMP_PATH)) fs.mkdirSync(TEMP_PATH, { recursive: true });
+const router = express.Router();
+const { upload } = require('./mega');
 
-// 🔧 Utility function to remove folder safely
-function removeFile(filePath) {
-    if (fs.existsSync(filePath)) {
-        fs.rmSync(filePath, { recursive: true, force: true });
-    }
+function removeFile(FilePath) {
+  if (!fs.existsSync(FilePath)) return false;
+  fs.rmSync(FilePath, { recursive: true, force: true });
+}
+
+// Ensure temp directory exists
+const tempDir = path.join(__dirname, 'temp');
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
 }
 
 router.get('/', async (req, res) => {
-    const id = makeid();
-    let num = req.query.number;
+  const id = makeid();
+  let num = req.query.number;
 
-    if (!num) {
-        return res.status(400).json({ error: "Missing 'number' parameter." });
-    }
+  if (!num) {
+    return res.status(400).send({ error: "Missing number query" });
+  }
 
-    num = num.replace(/[^0-9]/g, '');
-    console.log(`📲 Pairing request for: ${num}`);
+  num = num.replace(/[^0-9]/g, '');
+  if (num.length < 10) {
+    return res.status(400).send({ error: "Invalid number format" });
+  }
 
-    async function generatePairCode() {
-        const { state, saveCreds } = await useMultiFileAuthState(`${TEMP_PATH}/${id}`);
+  async function MALVIN_XD_PAIR_CODE() {
+    const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
 
-        try {
-            const browser = ["Safari", "Firefox", "Chrome"];
-            const randomBrowser = browser[Math.floor(Math.random() * browser.length)];
+    try {
+      let sock = makeWASocket({
+        auth: {
+          creds: state.creds,
+          keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }))
+        },
+        printQRInTerminal: false,
+        logger: pino({ level: "silent" }),
+        browser: Browsers.macOS("Safari")
+      });
 
-            const sock = makeWASocket({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" })),
-                },
-                printQRInTerminal: false,
-                generateHighQualityLinkPreview: true,
-                logger: pino({ level: "fatal" }),
-                browser: Browsers.macOS(randomBrowser)
-            });
+      // Request pairing code
+      try {
+        const code = await sock.requestPairingCode(num);
+        if (!res.headersSent) {
+          res.status(200).send({ code });
+        }
+      } catch (err) {
+        console.error("❌ Pairing failed:", err);
+        if (!res.headersSent) {
+          res.status(500).send({ error: "❗ WhatsApp pairing failed, try again later." });
+        }
+        removeFile('./temp/' + id);
+        return;
+      }
 
-            // ✅ Request pairing code
-            if (!sock.authState.creds.registered) {
-                await delay(2000);
-                const code = await sock.requestPairingCode(num);
-                if (!res.headersSent) {
-                    return res.status(200).json({ code });
-                }
-            }
+      sock.ev.on('creds.update', saveCreds);
 
-            sock.ev.on('creds.update', saveCreds);
+      sock.ev.on("connection.update", async (s) => {
+        const { connection, lastDisconnect } = s;
 
-            sock.ev.on("connection.update", async ({ connection, lastDisconnect }) => {
-                if (connection === "open") {
-                    await delay(3000);
-                    console.log(`✅ Connected: ${sock.user.id}`);
+        if (connection === "open") {
+          console.log(`✅ Connected as ${sock.user.id}`);
 
-                    const rf = `${TEMP_PATH}/${id}/creds.json`;
-                    if (fs.existsSync(rf)) {
-                        const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
-                        const sessionID = "malvin~" + mega_url.replace('https://mega.nz/file/', '');
+          await delay(3000);
+          const rf = path.join(__dirname, `/temp/${id}/creds.json`);
+          const dataExists = fs.existsSync(rf);
 
-                        const successMsg = `*Hey there, MALVIN-XD User!* 👋🏻
+          if (dataExists) {
+            try {
+              const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
+              const sessionId = "malvin~" + mega_url.replace('https://mega.nz/file/', '');
+
+              await sock.sendMessage(sock.user.id, { text: sessionId });
+
+              const desc = `*Hey there, MALVIN-XD User!* 👋🏻
 
 Your session has been successfully created!
 
 🔐 *Session ID:* Sent above  
-⚠️ Keep it safe — don't share it.
+⚠️ *Keep it safe!* Do NOT share it.
 
-💻 *GitHub:*  
-https://github.com/itsguruu/SILENT-LUNA  
-© Powered by *Malvin King*`;
+——————
+✅ *Stay Updated:*  
+https://whatsapp.com/channel/0029VbA6MSYJUM2TVOzCSb2A
 
-                        await sock.sendMessage(sock.user.id, { text: sessionID });
-                        await sock.sendMessage(sock.user.id, { text: successMsg });
-                    }
+💻 *Source Code:*  
+https://github.com/itsguruu/SILENT-LUNA
 
-                    await delay(1000);
-                    await sock.ws.close();
-                    removeFile(`${TEMP_PATH}/${id}`);
-                    process.exit();
-                } else if (connection === "close") {
-                    console.log("🔄 Reconnecting...");
-                    await delay(2000);
-                    generatePairCode();
-                }
-            });
+© Powered by Malvin King`;
 
-        } catch (err) {
-            console.error("❌ Pairing error:", err);
-            removeFile(`${TEMP_PATH}/${id}`);
-            if (!res.headersSent) {
-                return res.status(500).json({ error: "❗ Service temporarily unavailable. Try again later." });
+              await sock.sendMessage(sock.user.id, { text: desc });
+            } catch (e) {
+              console.error("⚠️ Upload failed:", e);
             }
-        }
-    }
+          }
 
-    return await generatePairCode();
+          await delay(2000);
+          await sock.ws.close();
+          removeFile('./temp/' + id);
+          process.exit();
+        }
+
+        if (connection === "close" && lastDisconnect?.error) {
+          console.log("🔁 Restarting connection...");
+          removeFile('./temp/' + id);
+          MALVIN_XD_PAIR_CODE();
+        }
+      });
+    } catch (err) {
+      console.error("❗ Service crashed:", err);
+      removeFile('./temp/' + id);
+      if (!res.headersSent) {
+        res.status(500).send({ error: "❗ Service Unavailable" });
+      }
+    }
+  }
+
+  return await MALVIN_XD_PAIR_CODE();
 });
 
 module.exports = router;
